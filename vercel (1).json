@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/Index_Main.html" },
+    { "source": "/residential", "destination": "/Residential_Main.html" },
+    { "source": "/commercial", "destination": "/Commercial_Main.html" },
+    { "source": "/institutional", "destination": "/Institutional_Main.html" }
+  ]
+}

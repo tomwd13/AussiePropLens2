@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commercial Analyser — AussiePropLens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0f1117;--ink2:#3a3d4a;--ink3:#7a7f8e;--paper:#fafaf8;--paper2:#f2f1ed;--paper3:#e8e6df;--gold:#c9973a;--teal:#1a7a6e;--red:#c23b2a;--amber:#b07d2a;--blue:#185fa5;--border:rgba(15,17,23,0.1);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);line-height:1.6;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(250,250,248,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--ink);text-decoration:none;}.nav-logo span{color:var(--gold);}
+.nav-back{font-size:0.875rem;color:var(--ink2);text-decoration:none;}
+.page-header{padding:88px 2rem 1.5rem;max-width:1200px;margin:0 auto;}
+.tier-badge{display:inline-flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);background:rgba(201,151,58,0.1);border:1px solid rgba(201,151,58,0.2);padding:5px 12px;border-radius:20px;margin-bottom:0.75rem;}
+.page-title{font-family:'DM Serif Display',serif;font-size:1.875rem;letter-spacing:-0.03em;margin-bottom:0.3rem;}
+.page-sub{font-size:0.9rem;color:var(--ink2);}
+.tool-wrap{max-width:1200px;margin:0 auto;padding:0 2rem 5rem;}
+.tool-grid{display:grid;grid-template-columns:380px 1fr;gap:1.5rem;align-items:start;}
+@media(max-width:960px){.tool-grid{grid-template-columns:1fr;}}
+.panel{background:var(--paper);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1.25rem;}
+.panel-head{padding:0.875rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.panel-head h3{font-size:0.825rem;font-weight:500;}
+.panel-body{padding:1.25rem;}
+.field{margin-bottom:1rem;}
+.field label{display:block;font-size:0.68rem;color:var(--ink3);margin-bottom:4px;letter-spacing:0.05em;text-transform:uppercase;}
+.field input[type=number],.field input[type=text],.field select{width:100%;padding:8px 11px;border:1px solid var(--border);border-radius:7px;font-size:0.875rem;font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);outline:none;transition:border-color 0.15s;}
+.field input:focus,.field select:focus{border-color:var(--gold);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.pc-wrap{display:flex;gap:8px;align-items:center;}
+.pc-input{width:110px!important;font-size:1.05rem!important;font-weight:500;letter-spacing:0.1em;flex-shrink:0;}
+.suburb-pill{display:none;flex:1;align-items:center;gap:7px;background:var(--paper2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:0.8rem;}
+.suburb-pill.show{display:inline-flex;}
+.suburb-pill b{font-weight:500;}.suburb-pill span{color:var(--ink3);font-size:0.72rem;}
+.suburb-pill .clr{cursor:pointer;color:var(--ink3);margin-left:auto;}.suburb-pill .clr:hover{color:var(--red);}
+.pc-hint{font-size:0.74rem;color:var(--ink3);margin-top:4px;min-height:16px;}.pc-hint.err{color:var(--red);}
+.dual{display:flex;align-items:center;gap:8px;margin-top:4px;}
+.dual input[type=range]{flex:1;accent-color:var(--ink);height:3px;cursor:pointer;}
+.dual input[type=number]{width:68px;padding:4px 7px;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);outline:none;text-align:right;flex-shrink:0;}
+.dual input[type=number]:focus{border-color:var(--gold);}
+.dual-unit{font-size:0.75rem;color:var(--ink3);flex-shrink:0;min-width:20px;}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:1rem;}
+.metric{background:var(--paper2);border-radius:9px;padding:10px 12px;}
+.mlabel{font-size:0.65rem;color:var(--ink3);letter-spacing:0.04em;text-transform:uppercase;margin-bottom:2px;}
+.mval{font-size:1.2rem;font-weight:500;}
+.data-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:1rem;}
+.data-item{background:var(--paper2);border-radius:8px;padding:8px 11px;}
+.dlbl{font-size:0.65rem;color:var(--ink3);margin-bottom:1px;}
+.dval{font-size:0.9rem;font-weight:500;}
+.growth-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:1rem;}
+.growth-box{border-radius:9px;padding:10px 12px;text-align:center;}
+.glbl{font-size:0.65rem;color:var(--ink3);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.04em;}
+.gval{font-size:1.1rem;font-weight:500;}
+.fees-table{width:100%;border-collapse:collapse;margin-bottom:1rem;}
+.fees-table tr{border-bottom:1px solid var(--border);}
+.fees-table tr:last-child{border-bottom:none;}
+.fees-table td{padding:6px 0;font-size:0.8rem;}
+.fees-table td:last-child{text-align:right;font-weight:500;}
+.risk-item{display:flex;align-items:flex-start;gap:8px;padding:8px 11px;border-radius:8px;margin-bottom:6px;}
+.risk-item:last-child{margin-bottom:0;}
+.risk-icon{font-size:12px;margin-top:1px;flex-shrink:0;}
+.rlbl{font-size:0.72rem;font-weight:500;margin-bottom:1px;}
+.rmsg{font-size:0.7rem;line-height:1.4;}
+.divider{font-size:0.65rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3);margin:1rem 0 0.6rem;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.usage-bar{background:var(--paper2);border-radius:8px;padding:9px 13px;margin-bottom:10px;}
+.usage-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.usage-label{font-size:0.65rem;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em;}
+.usage-count{font-size:0.72rem;font-weight:500;}
+.usage-track{height:4px;background:var(--paper3);border-radius:2px;overflow:hidden;}
+.usage-fill{height:100%;border-radius:2px;transition:width 0.4s;}
+.ai-btn{width:100%;padding:10px;background:var(--ink);color:var(--paper);border:none;border-radius:8px;font-size:0.825rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.2s;margin-bottom:0.875rem;}
+.ai-btn:hover{opacity:0.85;}.ai-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.sec-btn{width:100%;padding:8px;background:transparent;color:var(--ink);border:1px solid var(--border);border-radius:8px;font-size:0.825rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.2s;margin-bottom:0.875rem;}
+.sec-btn:hover{background:var(--paper2);}
+.ai-out{font-size:0.8rem;color:var(--ink2);}
+.iblock{border-radius:7px;padding:8px 12px;margin-bottom:6px;font-size:0.78rem;line-height:1.6;}
+.ihead{font-size:0.63rem;font-weight:500;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:3px;}
+.rating-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.flags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;}
+.flag{font-size:0.65rem;padding:2px 8px;border-radius:8px;background:var(--paper3);color:var(--ink2);}
+.news-item{padding:8px 0;border-bottom:1px solid var(--border);}.news-item:last-child{border-bottom:none;}
+.spinner{display:flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--ink3);padding:0.4rem 0;}
+@keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin 0.8s linear infinite;display:inline-block;}
+details{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:2rem;}
+details summary{padding:0.875rem 1.25rem;font-size:0.825rem;font-weight:500;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;background:var(--paper);}
+details summary::-webkit-details-marker{display:none;}
+details[open] summary{border-bottom:1px solid var(--border);}
+.details-body{padding:1.25rem;background:var(--paper);}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/Index_Main.html" class="nav-back">← Home</a>
+  <a href="/Index_Main.html" class="nav-logo">Aussie<span>Prop</span>Lens</a>
+  <span style="font-size:0.72rem;color:var(--gold);background:rgba(201,151,58,0.1);padding:3px 11px;border-radius:20px;border:1px solid rgba(201,151,58,0.2);">Commercial · $120/mo</span>
+</nav>
+<div class="page-header">
+  <div class="tier-badge">🏢 Commercial analyser</div>
+  <h1 class="page-title">Commercial deal analyser</h1>
+  <p class="page-sub">Cap rate, NOI, DSCR, WALE, council rates, stamp duty, growth trends and AI deal intelligence.</p>
+</div>
+<div class="tool-wrap">
+  <div class="tool-grid">
+    <div>
+      <div class="panel">
+        <div class="panel-head"><h3>Asset details</h3></div>
+        <div class="panel-body">
+          <div class="field">
+            <label>Postcode</label>
+            <div class="pc-wrap">
+              <input type="text" class="pc-input" id="pc" maxlength="4" placeholder="2150" oninput="onPC(this.value)">
+              <div class="suburb-pill" id="pc-pill"><b id="pc-suburb"></b><span id="pc-state"></span><span class="clr" onclick="clearPC()">✕</span></div>
+            </div>
+            <div class="pc-hint" id="pc-hint">Enter a 4-digit postcode</div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Asset class</label>
+              <select id="aclass" onchange="calc()"><option>Office</option><option selected>Retail strip</option><option>Industrial</option><option>Mixed-use</option><option>Strata office</option></select>
+            </div>
+            <div class="field"><label>Tenant covenant</label>
+              <select id="covenant" onchange="calc()"><option>ASX-listed</option><option selected>National brand</option><option>Regional SME</option><option>Government</option><option>Startup</option></select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Purchase price ($)</label><input type="number" id="price" value="3200000" oninput="calc()"></div>
+            <div class="field"><label>Annual gross rent ($)</label><input type="number" id="rent" value="224000" oninput="calc()"></div>
+          </div>
+          <div class="field"><label>Operating expenses ($)</label><input type="number" id="opex" value="28000" oninput="calc()"></div>
+          <div class="field">
+            <label>Vacancy rate — <b id="vac-lbl">5%</b></label>
+            <div class="dual"><input type="range" id="vac-s" min="0" max="30" value="5" step="1" oninput="sync('vac',this.value)"><input type="number" id="vac-n" value="5" min="0" max="30" step="1" oninput="sync('vac',this.value)"><span class="dual-unit">%</span></div>
+          </div>
+          <div class="field">
+            <label>Interest rate — <b id="rate-lbl">6.50%</b></label>
+            <div class="dual"><input type="range" id="rate-s" min="3" max="12" value="6.5" step="0.05" oninput="sync('rate',this.value)"><input type="number" id="rate-n" value="6.5" min="3" max="12" step="0.05" oninput="sync('rate',this.value)"><span class="dual-unit">%</span></div>
+          </div>
+          <div class="field">
+            <label>WALE (years) — <b id="wale-lbl">5.0yr</b></label>
+            <div class="dual"><input type="range" id="wale-s" min="0.5" max="15" value="5" step="0.5" oninput="sync('wale',this.value)"><input type="number" id="wale-n" value="5" min="0.5" max="15" step="0.5" oninput="sync('wale',this.value)"><span class="dual-unit">yr</span></div>
+          </div>
+          <div class="field">
+            <label>LVR — <b id="lvr-lbl">60%</b></label>
+            <div class="dual"><input type="range" id="lvr-s" min="40" max="70" value="60" step="5" oninput="sync('lvr',this.value)"><input type="number" id="lvr-n" value="60" min="40" max="70" step="5" oninput="sync('lvr',this.value)"><span class="dual-unit">%</span></div>
+          </div>
+          <div class="field">
+            <label>Rent escalation p.a. — <b id="esc-lbl">3.5%</b></label>
+            <div class="dual"><input type="range" id="esc-s" min="0" max="6" value="3.5" step="0.5" oninput="sync('esc',this.value)"><input type="number" id="esc-n" value="3.5" min="0" max="6" step="0.5" oninput="sync('esc',this.value)"><span class="dual-unit">%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <div class="panel-head"><h3>Financial metrics</h3><span id="suburb-lbl" style="font-size:0.72rem;color:var(--ink3)">Enter a postcode</span></div>
+        <div class="panel-body">
+          <div class="metrics-grid">
+            <div class="metric"><div class="mlabel">Cap rate</div><div class="mval" id="m-cap">—</div></div>
+            <div class="metric"><div class="mlabel">NOI (annual)</div><div class="mval" id="m-noi">—</div></div>
+            <div class="metric"><div class="mlabel">DSCR</div><div class="mval" id="m-dscr">—</div></div>
+            <div class="metric"><div class="mlabel">5yr NOI (grown)</div><div class="mval" id="m-noi5">—</div></div>
+            <div class="metric"><div class="mlabel">Cap vs funding</div><div class="mval" id="m-spread">—</div></div>
+            <div class="metric"><div class="mlabel">Annual interest</div><div class="mval" id="m-int">—</div></div>
+          </div>
+          <div class="divider">Risk indicators</div>
+          <div id="risks"></div>
+          <div class="divider">Precinct benchmarks</div>
+          <div class="data-grid" id="benchmarks"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Fees, taxes & council rates</h3></div>
+        <div class="panel-body"><div id="fees-panel"><p style="font-size:0.8rem;color:var(--ink3)">Enter a postcode to load council rates, stamp duty, and fees.</p></div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Capital growth trends</h3></div>
+        <div class="panel-body"><div id="growth-panel"><p style="font-size:0.8rem;color:var(--ink3)">Enter a postcode to load 1yr and 3yr trailing growth rates.</p></div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>AI deal intelligence</h3></div>
+        <div class="panel-body">
+          <div class="usage-bar" id="usage-bar"></div>
+          <button class="ai-btn" id="ai-btn" onclick="runAI()">✦ Generate deal analysis →</button>
+          <div class="ai-out" id="ai-out"><p style="color:var(--ink3)">Enter a postcode and click generate for AI-powered deal intelligence.</p></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h3>Commercial market news</h3></div>
+        <div class="panel-body">
+          <button class="sec-btn" onclick="fetchNews()">↻ Load commercial news</button>
+          <div class="ai-out" id="news-out"><p style="color:var(--ink3)">Click above to load commercial property news.</p></div>
+        </div>
+      </div>
+
+      <!-- RESIDENTIAL ADD-ON -->
+      <details>
+        <summary><span>🏡 Residential analyser <span style="font-size:0.72rem;color:var(--ink3);font-weight:400;">(included with your plan)</span></span><span style="font-size:0.78rem;color:var(--ink3);font-weight:400;">Expand →</span></summary>
+        <div class="details-body">
+          <p style="font-size:0.78rem;color:var(--ink3);margin-bottom:1rem;">Full residential analysis included in your Commercial plan. <a href="/Residential_Main.html" style="color:var(--gold);">Open full tool →</a></p>
+          <div class="field-row">
+            <div class="field"><label>Postcode (residential)</label><input type="text" id="r-pc" maxlength="4" placeholder="2010" oninput="onRPC(this.value)"><div class="pc-hint" id="r-pc-hint" style="font-size:0.72rem;color:var(--ink3);margin-top:3px;">Enter postcode</div></div>
+            <div class="field"><label>Purchase price ($)</label><input type="number" id="r-price" value="850000" oninput="calcR()"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>Weekly rent ($)</label><input type="number" id="r-rent" value="650" oninput="calcR()"></div>
+            <div class="field"><label>Interest rate (%)</label><input type="number" id="r-rate" value="6.1" step="0.05" oninput="calcR()"></div>
+          </div>
+          <div id="r-metrics" style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:0.5rem;margin-bottom:0.75rem;"></div>
+          <div id="r-stress" style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:0.75rem;"></div>
+          <div id="r-growth" style="margin-bottom:0.75rem;"></div>
+          <div id="r-fees" style="margin-bottom:0.5rem;"></div>
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+
+<script>
+const PC={
+  '2000':{suburb:'Sydney CBD',state:'NSW',council:'City of Sydney',councilRates:1380,waterRates:950,crime:48,walk:98,transit:97,growth1yr:5.2,growth3yr:4.8,yield:4.2,vac:2.1,clear:71,dom:22,stampDuty:function(p){return calcSD_NSW(p);}},
+  '2010':{suburb:'Surry Hills',state:'NSW',council:'City of Sydney',councilRates:1320,waterRates:950,crime:55,walk:89,transit:88,growth1yr:7.8,growth3yr:7.1,yield:4.3,vac:1.8,clear:76,dom:24,stampDuty:function(p){return calcSD_NSW(p);}},
+  '2015':{suburb:'Alexandria',state:'NSW',council:'City of Sydney',councilRates:1350,waterRates:950,crime:58,walk:82,transit:84,growth1yr:8.9,growth3yr:7.4,yield:4.1,vac:1.6,clear:77,dom:21,stampDuty:function(p){return calcSD_NSW(p);}},
+  '2026':{suburb:'Bondi',state:'NSW',council:'Waverley Council',councilRates:1540,waterRates:950,crime:61,walk:85,transit:79,growth1yr:4.9,growth3yr:5.8,yield:3.6,vac:1.4,clear:78,dom:18,stampDuty:function(p){return calcSD_NSW(p);}},
+  '2042':{suburb:'Newtown',state:'NSW',council:'Inner West Council',councilRates:1280,waterRates:950,crime:54,walk:92,transit:88,growth1yr:7.2,growth3yr:6.5,yield:4.3,vac:1.7,clear:74,dom:22,stampDuty:function(p){return calcSD_NSW(p);}},
+  '2060':{suburb:'North Sydney',state:'NSW',council:'North Sydney Council',councilRates:1190,waterRates:950,crime:67,walk:84,transit:86,growth1yr:6.8,growth3yr:6.1,yield:4.0,vac:2.0,clear:72,dom:25,stampDuty:function(p){return calcSD_NSW(p);}},
+  '2065':{suburb:'St Leonards',state:'NSW',council:'Lane Cove Council',councilRates:1150,waterRates:950,crime:64,walk:82,transit:85,growth1yr:7.4,growth3yr:6.8,yield:4.2,vac:1.9,clear:73,dom:23,stampDuty:function(p){return calcSD_NSW(p);}},
+  '2113':{suburb:'Macquarie Park',state:'NSW',council:'Ryde Council',councilRates:1060,waterRates:920,crime:66,walk:76,transit:82,growth1yr:7.8,growth3yr:6.4,yield:4.4,vac:1.8,clear:72,dom:24,stampDuty:function(p){return calcSD_NSW(p);}},
+  '2150':{suburb:'Parramatta',state:'NSW',council:'Cumberland Council',councilRates:1080,waterRates:900,crime:48,walk:78,transit:84,growth1yr:10.2,growth3yr:8.4,yield:4.9,vac:2.4,clear:70,dom:28,stampDuty:function(p){return calcSD_NSW(p);}},
+  '2204':{suburb:'Marrickville',state:'NSW',council:'Inner West Council',councilRates:1240,waterRates:950,crime:53,walk:86,transit:85,growth1yr:9.1,growth3yr:7.8,yield:4.3,vac:1.6,clear:76,dom:21,stampDuty:function(p){return calcSD_NSW(p);}},
+  '3000':{suburb:'Melbourne CBD',state:'VIC',council:'City of Melbourne',councilRates:1020,waterRates:820,crime:44,walk:97,transit:96,growth1yr:3.1,growth3yr:4.2,yield:4.7,vac:3.1,clear:68,dom:34,stampDuty:function(p){return calcSD_VIC(p);}},
+  '3004':{suburb:'South Yarra',state:'VIC',council:'City of Stonnington',councilRates:1180,waterRates:820,crime:59,walk:88,transit:87,growth1yr:4.2,growth3yr:5.1,yield:4.2,vac:2.4,clear:70,dom:27,stampDuty:function(p){return calcSD_VIC(p);}},
+  '3008':{suburb:'Docklands',state:'VIC',council:'City of Melbourne',councilRates:980,waterRates:820,crime:51,walk:86,transit:88,growth1yr:2.4,growth3yr:3.8,yield:5.1,vac:4.2,clear:65,dom:38,stampDuty:function(p){return calcSD_VIC(p);}},
+  '3121':{suburb:'Richmond',state:'VIC',council:'City of Yarra',councilRates:1140,waterRates:820,crime:57,walk:87,transit:86,growth1yr:4.9,growth3yr:5.6,yield:4.4,vac:2.0,clear:72,dom:23,stampDuty:function(p){return calcSD_VIC(p);}},
+  '4000':{suburb:'Brisbane CBD',state:'QLD',council:'Brisbane City Council',councilRates:1340,waterRates:760,crime:51,walk:86,transit:84,growth1yr:12.4,growth3yr:9.1,yield:5.2,vac:1.6,clear:72,dom:22,stampDuty:function(p){return calcSD_QLD(p);}},
+  '4006':{suburb:'Fortitude Valley',state:'QLD',council:'Brisbane City Council',councilRates:1280,waterRates:760,crime:46,walk:84,transit:82,growth1yr:13.8,growth3yr:9.8,yield:5.5,vac:2.1,clear:71,dom:24,stampDuty:function(p){return calcSD_QLD(p);}},
+  '4101':{suburb:'South Brisbane',state:'QLD',council:'Brisbane City Council',councilRates:1310,waterRates:760,crime:55,walk:84,transit:82,growth1yr:12.8,growth3yr:9.4,yield:5.0,vac:1.8,clear:73,dom:20,stampDuty:function(p){return calcSD_QLD(p);}},
+  '5000':{suburb:'Adelaide CBD',state:'SA',council:'City of Adelaide',councilRates:1120,waterRates:680,crime:50,walk:88,transit:84,growth1yr:10.4,growth3yr:7.8,yield:5.6,vac:1.4,clear:74,dom:19,stampDuty:function(p){return calcSD_SA(p);}},
+  '6000':{suburb:'Perth CBD',state:'WA',council:'City of Perth',councilRates:1640,waterRates:1240,crime:52,walk:86,transit:82,growth1yr:19.8,growth3yr:11.2,yield:5.9,vac:1.3,clear:76,dom:17,stampDuty:function(p){return calcSD_WA(p);}},
+  '2600':{suburb:'Canberra City',state:'ACT',council:'ACT Government',councilRates:2840,waterRates:1100,crime:62,walk:74,transit:72,growth1yr:2.1,growth3yr:3.8,yield:4.6,vac:2.2,clear:68,dom:30,stampDuty:function(p){return calcSD_ACT(p);}},
+};
+
+function calcSD_NSW(p){if(p<=800000)return Math.max(0,1.25+((p-14000)*0.0125));if(p<=1000000)return 21330+((p-800000)*0.035);if(p<=3000000)return 28330+((p-1000000)*0.045);return 118330+((p-3000000)*0.07);}
+function calcSD_VIC(p){if(p<=25000)return p*0.014;if(p<=130000)return 350+((p-25000)*0.024);if(p<=960000)return 2870+((p-130000)*0.06);return p*0.065;}
+function calcSD_QLD(p){if(p<=5000)return 0;if(p<=75000)return(p-5000)*0.015;if(p<=540000)return 1050+((p-75000)*0.035);if(p<=1000000)return 17325+((p-540000)*0.045);return 38025+((p-1000000)*0.0575);}
+function calcSD_SA(p){if(p<=300000)return p*0.01+(p>12000?(p-12000)*0.01:0);return 11580+((p-300000)*0.055)+(p>500000?(p-500000)*0.015:0);}
+function calcSD_WA(p){if(p<=80000)return p*0.019;if(p<=100000)return 1520+((p-80000)*0.0285);if(p<=250000)return 2090+((p-100000)*0.03);if(p<=500000)return 6590+((p-250000)*0.0385);return 16215+((p-500000)*0.0475);}
+function calcSD_ACT(p){if(p<=200000)return p*0.0006;if(p<=500000)return 120+((p-200000)*0.034);if(p<=750000)return 9120+((p-500000)*0.043);return 19870+((p-750000)*0.055);}
+
+const TIER='commercial',LIMIT=5000;
+function getUsage(){const key='apl_usage_'+TIER,now=new Date(),mk=now.getFullYear()+'-'+now.getMonth();try{const s=JSON.parse(localStorage.getItem(key)||'{}');if(s.month!==mk)return{month:mk,count:0};return s;}catch(e){return{month:new Date().getFullYear()+'-'+new Date().getMonth(),count:0};}}
+function saveUsage(u){try{localStorage.setItem('apl_usage_'+TIER,JSON.stringify(u));}catch(e){}}
+function consumeCall(){const u=getUsage();if(u.count>=LIMIT)return false;u.count++;saveUsage(u);renderUsage();return true;}
+function renderUsage(){const u=getUsage(),rem=Math.max(0,LIMIT-u.count),pct=Math.round((u.count/LIMIT)*100),c=rem>1000?'var(--teal)':rem>200?'var(--amber)':'var(--red)';const el=document.getElementById('usage-bar');if(!el)return;el.innerHTML='<div class="usage-top"><span class="usage-label">AI calls this month</span><span class="usage-count" style="color:'+c+'">'+rem.toLocaleString()+' / '+LIMIT.toLocaleString()+' remaining</span></div><div class="usage-track"><div class="usage-fill" style="width:'+pct+'%;background:'+c+'"></div></div>'+(rem===0?'<div style="font-size:0.72rem;color:var(--red);margin-top:5px;">Limit reached. <a href="/Index_Main.html#pricing" style="color:var(--red);font-weight:500;">Upgrade →</a></div>':'');}
+
+let currentPC=null,calcTimer=null;
+
+function onPC(v){
+  v=v.replace(/\D/g,'');document.getElementById('pc').value=v;
+  const hint=document.getElementById('pc-hint'),pill=document.getElementById('pc-pill');
+  if(v.length<4){pill.classList.remove('show');hint.className='pc-hint';hint.textContent=v.length>0?(4-v.length)+' more digit(s)…':'Enter a 4-digit postcode';currentPC=null;clearPanels();return;}
+  if(PC[v]){currentPC=v;const d=PC[v];document.getElementById('pc-suburb').textContent=d.suburb;document.getElementById('pc-state').textContent=d.state;pill.classList.add('show');hint.className='pc-hint';hint.textContent='';document.getElementById('suburb-lbl').textContent=d.suburb+', '+d.state;calc();}
+  else{currentPC=null;pill.classList.remove('show');hint.className='pc-hint err';hint.textContent='Postcode not found.';document.getElementById('suburb-lbl').textContent='Enter a postcode';clearPanels();}
+}
+function clearPC(){document.getElementById('pc').value='';document.getElementById('pc-pill').classList.remove('show');document.getElementById('pc-hint').textContent='Enter a 4-digit postcode';document.getElementById('pc-hint').className='pc-hint';document.getElementById('suburb-lbl').textContent='Enter a postcode';currentPC=null;clearPanels();}
+function clearPanels(){
+  document.getElementById('fees-panel').innerHTML='<p style="font-size:0.8rem;color:var(--ink3)">Enter a postcode to load council rates and fees.</p>';
+  document.getElementById('growth-panel').innerHTML='<p style="font-size:0.8rem;color:var(--ink3)">Enter a postcode to load growth trends.</p>';
+}
+
+function sync(id,val){
+  val=parseFloat(val);const s=document.getElementById(id+'-s'),n=document.getElementById(id+'-n');
+  val=Math.min(parseFloat(s.max),Math.max(parseFloat(s.min),isNaN(val)?parseFloat(s.min):val));
+  s.value=val;n.value=val;updateLabels();clearTimeout(calcTimer);calcTimer=setTimeout(calc,60);
+}
+function updateLabels(){
+  document.getElementById('vac-lbl').textContent=document.getElementById('vac-s').value+'%';
+  document.getElementById('rate-lbl').textContent=parseFloat(document.getElementById('rate-s').value).toFixed(2)+'%';
+  document.getElementById('wale-lbl').textContent=parseFloat(document.getElementById('wale-s').value).toFixed(1)+'yr';
+  document.getElementById('lvr-lbl').textContent=document.getElementById('lvr-s').value+'%';
+  document.getElementById('esc-lbl').textContent=parseFloat(document.getElementById('esc-s').value).toFixed(1)+'%';
+}
+
+function calc(){
+  updateLabels();
+  const price=parseFloat(document.getElementById('price').value)||0;
+  const gross=parseFloat(document.getElementById('rent').value)||0;
+  const vac=parseFloat(document.getElementById('vac-s').value)/100;
+  const opex=parseFloat(document.getElementById('opex').value)||0;
+  const rate=parseFloat(document.getElementById('rate-s').value)/100;
+  const wale=parseFloat(document.getElementById('wale-s').value);
+  const lvr=parseFloat(document.getElementById('lvr-s').value)/100;
+  const esc=parseFloat(document.getElementById('esc-s').value)/100;
+  const eff=gross*(1-vac),noi=eff-opex;
+  const cap=price>0?(noi/price)*100:0;
+  const loan=price*lvr,annInt=loan*rate;
+  const dscr=annInt>0?noi/annInt:0;
+  const noi5=noi*Math.pow(1+esc,5);
+  const spread=cap-rate*100;
+  document.getElementById('m-cap').textContent=cap.toFixed(2)+'%';
+  document.getElementById('m-noi').textContent='$'+Math.round(noi).toLocaleString();
+  const de=document.getElementById('m-dscr');de.textContent=dscr.toFixed(2)+'x';de.style.color=dscr>=1.25?'var(--teal)':dscr>=1?'var(--amber)':'var(--red)';
+  document.getElementById('m-noi5').textContent='$'+Math.round(noi5).toLocaleString();
+  const se=document.getElementById('m-spread');se.textContent=(spread>0?'+':'')+spread.toFixed(2)+'%';se.style.color=spread>0?'var(--teal)':'var(--red)';
+  document.getElementById('m-int').textContent='$'+Math.round(annInt).toLocaleString();
+  const risks=[
+    {ok:dscr>=1.25,warn:dscr>=1,l:'Debt service coverage',msg:dscr>=1.25?dscr.toFixed(2)+'x — above 1.25x threshold':dscr>=1?dscr.toFixed(2)+'x — marginal':dscr.toFixed(2)+'x — fails to cover interest'},
+    {ok:wale>=4,warn:wale>=2,l:'WALE security',msg:wale>=4?wale.toFixed(1)+'yr — strong tenure':wale>=2?wale.toFixed(1)+'yr — moderate risk':wale.toFixed(1)+'yr — high rollover risk'},
+    {ok:spread>0.5,warn:spread>0,l:'Cap rate spread',msg:spread>0.5?'+'+spread.toFixed(2)+'% positive spread':spread>0?'Thin '+spread.toFixed(2)+'% spread':'Negative spread — rate exceeds yield'},
+    {ok:vac<=0.05,warn:vac<=0.15,l:'Vacancy',msg:vac<=0.05?'Low — well leased asset':vac<=0.15?'Moderate income risk':'High vacancy — value-add risk'},
+  ];
+  document.getElementById('risks').innerHTML=risks.map(r=>{
+    const c=r.ok?'var(--teal)':r.warn?'var(--amber)':'var(--red)';
+    const bg=r.ok?'rgba(26,122,110,0.07)':r.warn?'rgba(176,125,42,0.07)':'rgba(194,59,42,0.07)';
+    const icon=r.ok?'✓':r.warn?'⚠':'✕';
+    return`<div class="risk-item" style="background:${bg}"><span class="risk-icon" style="color:${c}">${icon}</span><div><div class="rlbl" style="color:${c}">${r.l}</div><div class="rmsg" style="color:${c}">${r.msg}</div></div></div>`;
+  }).join('');
+  const loc=currentPC&&PC[currentPC]?PC[currentPC].suburb+', '+PC[currentPC].state:'—';
+  document.getElementById('benchmarks').innerHTML=[
+    {l:'Precinct vacancy',v:'4.2%'},{l:'Market cap rate',v:'5.8–6.4%'},
+    {l:'Rental growth',v:'+4.1% p.a.'},{l:'Your cap vs market',v:cap.toFixed(2)+'% vs 5.8–6.4%'},
+    {l:'Location',v:loc},{l:'Covenant',v:document.getElementById('covenant').value},
+  ].map(m=>`<div class="data-item"><div class="dlbl">${m.l}</div><div class="dval">${m.v}</div></div>`).join('');
+  if(currentPC&&PC[currentPC]){renderFees(price);renderGrowth();}
+}
+
+function renderFees(price){
+  if(!currentPC||!PC[currentPC])return;
+  const d=PC[currentPC];
+  const sd=Math.round(d.stampDuty(price));
+  const legal=3500,due=Math.round(price*0.002),stamp=sd;
+  const total=stamp+legal+due+500;
+  document.getElementById('fees-panel').innerHTML=`
+    <div class="divider" style="margin-top:0">Upfront acquisition costs</div>
+    <table class="fees-table">
+      <tr><td>Stamp duty (${d.state})</td><td style="color:var(--red)">$${stamp.toLocaleString()}</td></tr>
+      <tr><td>Legal & conveyancing</td><td>$${legal.toLocaleString()}</td></tr>
+      <tr><td>Due diligence (est.)</td><td>$${due.toLocaleString()}</td></tr>
+      <tr><td>ASIC / FIRB / other</td><td>$500+</td></tr>
+      <tr style="border-top:2px solid var(--border)"><td><b>Total upfront (est.)</b></td><td><b style="color:var(--red)">$${total.toLocaleString()}</b></td></tr>
+    </table>
+    <div class="divider">Annual holding costs</div>
+    <table class="fees-table">
+      <tr><td>Council rates</td><td>$${d.councilRates.toLocaleString()}/yr</td></tr>
+      <tr><td>Council</td><td style="color:var(--ink3);font-size:0.72rem;">${d.council}</td></tr>
+      <tr><td>Water & sewerage</td><td>$${d.waterRates.toLocaleString()}/yr</td></tr>
+      <tr><td>Land tax (estimate)</td><td>Varies — consult adviser</td></tr>
+      <tr><td>Building insurance</td><td>~$${Math.round(price*0.0012).toLocaleString()}/yr</td></tr>
+    </table>
+    <p style="font-size:0.67rem;color:var(--ink3);margin-top:6px;">* Commercial stamp duty rates vary by state. Figures are estimates only.</p>`;
+}
+
+function renderGrowth(){
+  if(!currentPC||!PC[currentPC])return;
+  const d=PC[currentPC];
+  const price=parseFloat(document.getElementById('price').value)||0;
+  const proj1=Math.round(price*(1+d.growth1yr/100));
+  const proj3=Math.round(price*Math.pow(1+d.growth3yr/100,3));
+  const g1c=d.growth1yr>=8?'var(--teal)':d.growth1yr>=4?'var(--amber)':'var(--red)';
+  const g3c=d.growth3yr>=6?'var(--teal)':d.growth3yr>=3?'var(--amber)':'var(--red)';
+  document.getElementById('growth-panel').innerHTML=`
+    <div class="growth-grid">
+      <div class="growth-box" style="background:rgba(26,122,110,0.07)"><div class="glbl">1-yr trailing</div><div class="gval" style="color:${g1c}">${d.growth1yr>=0?'+':''}${d.growth1yr.toFixed(1)}%</div></div>
+      <div class="growth-box" style="background:rgba(24,95,165,0.07)"><div class="glbl">3-yr trailing (p.a.)</div><div class="gval" style="color:${g3c}">${d.growth3yr>=0?'+':''}${d.growth3yr.toFixed(1)}%</div></div>
+      <div class="growth-box" style="background:rgba(176,125,42,0.07)"><div class="glbl">Market yield</div><div class="gval" style="color:var(--amber)">${d.yield.toFixed(1)}%</div></div>
+    </div>
+    <div class="data-grid" style="margin-top:0.5rem">
+      <div class="data-item"><div class="dlbl">In 1 year (est.)</div><div class="dval">$${proj1.toLocaleString()}</div></div>
+      <div class="data-item"><div class="dlbl">In 3 years (est.)</div><div class="dval">$${proj3.toLocaleString()}</div></div>
+    </div>`;
+}
+
+// Residential add-on
+let rPC=null;
+function onRPC(v){
+  v=v.replace(/\D/g,'');document.getElementById('r-pc').value=v;
+  const hint=document.getElementById('r-pc-hint');
+  if(v.length<4){rPC=null;hint.textContent=v.length>0?(4-v.length)+' more…':'Enter postcode';return;}
+  if(PC[v]){rPC=v;hint.textContent=PC[v].suburb+', '+PC[v].state;hint.style.color='var(--teal)';calcR();}
+  else{rPC=null;hint.textContent='Not found';hint.style.color='var(--red)';}
+}
+function calcR(){
+  const price=parseFloat(document.getElementById('r-price').value)||0;
+  const wr=parseFloat(document.getElementById('r-rent').value)||0;
+  const rate=parseFloat(document.getElementById('r-rate').value)/100;
+  const ar=wr*52,loan=price*0.8,n=360,r=rate/12;
+  const mo=r===0?loan/n:loan*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);
+  const gross=price>0?(ar/price)*100:0;
+  const cf=(ar-mo*12)/12;
+  document.getElementById('r-metrics').innerHTML=[
+    {l:'Gross yield',v:gross.toFixed(2)+'%'},{l:'Monthly repayment',v:'$'+Math.round(mo).toLocaleString()},
+    {l:'Monthly cash flow',v:(cf>=0?'+$':'-$')+Math.abs(Math.round(cf)).toLocaleString(),c:cf>=0?'var(--teal)':'var(--red)'},
+  ].map(m=>`<div class="metric"><div class="mlabel">${m.l}</div><div class="mval" style="${m.c?'color:'+m.c:''}">${m.v}</div></div>`).join('');
+  document.getElementById('r-stress').innerHTML=[1,2,3].map(b=>{
+    const nr=(rate+b/100)/12,nm=nr===0?loan/n:loan*(nr*Math.pow(1+nr,n))/(Math.pow(1+nr,n)-1),ncf=(ar-nm*12)/12,ok=ncf>=-300;
+    return`<div class="metric" style="background:${ok?'rgba(26,122,110,0.08)':'rgba(194,59,42,0.08)'}"><div class="mlabel" style="color:${ok?'var(--teal)':'var(--red)'}">+${b}% rise</div><div class="mval" style="color:${ok?'var(--teal)':'var(--red)'}">${ncf>=0?'+$':'-$'}${Math.abs(Math.round(ncf)).toLocaleString()}/mo</div></div>`;
+  }).join('');
+  if(rPC&&PC[rPC]){
+    const d=PC[rPC],p1=Math.round(price*(1+d.growth1yr/100)),p3=Math.round(price*Math.pow(1+d.growth3yr/100,3));
+    const sd=Math.round(d.stampDuty(price));
+    document.getElementById('r-growth').innerHTML=`<div class="growth-grid"><div class="growth-box" style="background:rgba(26,122,110,0.07)"><div class="glbl">1yr growth</div><div class="gval" style="color:var(--teal)">+${d.growth1yr}%</div></div><div class="growth-box" style="background:rgba(24,95,165,0.07)"><div class="glbl">3yr growth p.a.</div><div class="gval" style="color:var(--blue)">+${d.growth3yr}%</div></div><div class="growth-box" style="background:rgba(176,125,42,0.07)"><div class="glbl">3yr est. value</div><div class="gval" style="color:var(--amber)">$${p3.toLocaleString()}</div></div></div>`;
+    document.getElementById('r-fees').innerHTML=`<div class="divider">Estimated upfront costs</div><table class="fees-table"><tr><td>Stamp duty (${d.state})</td><td style="color:var(--red)">$${sd.toLocaleString()}</td></tr><tr><td>Council rates (${d.council})</td><td>$${d.councilRates.toLocaleString()}/yr</td></tr><tr><td>Water rates</td><td>$${d.waterRates.toLocaleString()}/yr</td></tr></table>`;
+  }
+}
+
+async function runAI(){
+  if(!consumeCall()){document.getElementById('ai-out').innerHTML='<p style="color:var(--red);font-size:0.78rem">Monthly AI call limit reached (5,000/mo). <a href="/Index_Main.html#pricing" style="color:var(--red);font-weight:500;">Upgrade →</a></p>';return;}
+  const addr=currentPC&&PC[currentPC]?PC[currentPC].suburb+', '+PC[currentPC].state:'the specified location';
+  const d=currentPC&&PC[currentPC]?PC[currentPC]:null;
+  const aclass=document.getElementById('aclass').value,price=document.getElementById('price').value,rent=document.getElementById('rent').value,covenant=document.getElementById('covenant').value,wale=document.getElementById('wale-s').value;
+  const btn=document.getElementById('ai-btn');btn.disabled=true;
+  document.getElementById('ai-out').innerHTML='<div class="spinner"><span class="spin">⟳</span> Analysing deal...</div>';
+  const prompt=`You are a senior Australian commercial property fund manager. Provide deal intelligence for a ${aclass} at ${addr}. Price: $${parseInt(price).toLocaleString()}, rent: $${parseInt(rent).toLocaleString()}/yr, tenant: ${covenant}, WALE: ${wale}yr.${d?` Council: ${d.council}, rates: $${d.councilRates}/yr, 1yr growth: ${d.growth1yr}%, 3yr growth: ${d.growth3yr}%.`:''} Return ONLY valid JSON: {"precinctOutlook":string (2 sentences),"tenantCovenant":string (2 sentences),"structuringAdvice":string (2 sentences),"exitStrategy":string (2 sentences),"growthOutlook":string (1 sentence),"riskFlags":array of 4 strings,"opportunities":array of 3 strings,"rating":number 1-10,"ratingLabel":one word}.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const p=JSON.parse(data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim());
+    const rc=p.rating>=8?'var(--teal)':p.rating>=6?'var(--amber)':'var(--red)';
+    const rb=p.rating>=8?'rgba(26,122,110,0.1)':p.rating>=6?'rgba(176,125,42,0.1)':'rgba(194,59,42,0.1)';
+    document.getElementById('ai-out').innerHTML=`
+      <div class="rating-row"><span style="font-size:0.82rem;font-weight:500">${aclass} · ${addr}</span><div style="display:flex;align-items:center;gap:5px;padding:3px 11px;border-radius:20px;background:${rb}"><span style="font-size:1.1rem;font-weight:500;color:${rc}">${p.rating}</span><span style="font-size:0.72rem;color:${rc}">/10 · ${p.ratingLabel}</span></div></div>
+      <div class="iblock" style="background:rgba(24,95,165,0.07)"><div class="ihead" style="color:var(--blue)">Precinct outlook</div><div style="color:var(--ink2)">${p.precinctOutlook}</div></div>
+      <div class="iblock" style="background:var(--paper2)"><div class="ihead" style="color:var(--ink3)">Tenant covenant</div><div style="color:var(--ink2)">${p.tenantCovenant}</div></div>
+      <div class="iblock" style="background:rgba(26,122,110,0.07)"><div class="ihead" style="color:var(--teal)">Deal structuring</div><div style="color:var(--ink2)">${p.structuringAdvice}</div></div>
+      <div class="iblock" style="background:rgba(176,125,42,0.07)"><div class="ihead" style="color:var(--amber)">Exit strategy</div><div style="color:var(--ink2)">${p.exitStrategy}</div></div>
+      <div class="iblock" style="background:rgba(26,122,110,0.05)"><div class="ihead" style="color:var(--teal)">Growth outlook</div><div style="color:var(--ink2)">${p.growthOutlook}</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div><p style="font-size:0.63rem;font-weight:500;color:var(--red);margin:0 0 4px;text-transform:uppercase;letter-spacing:0.06em">Risk flags</p><div class="flags">${p.riskFlags.map(f=>`<span class="flag" style="background:rgba(194,59,42,0.08);color:var(--red)">${f}</span>`).join('')}</div></div>
+        <div><p style="font-size:0.63rem;font-weight:500;color:var(--teal);margin:0 0 4px;text-transform:uppercase;letter-spacing:0.06em">Opportunities</p><div class="flags">${p.opportunities.map(f=>`<span class="flag" style="background:rgba(26,122,110,0.08);color:var(--teal)">${f}</span>`).join('')}</div></div>
+      </div>`;
+  }catch(e){document.getElementById('ai-out').innerHTML='<p style="color:var(--red);font-size:0.78rem">Could not generate analysis. Please try again.</p>';}
+  btn.disabled=false;
+}
+
+async function fetchNews(){
+  if(!consumeCall()){document.getElementById('news-out').innerHTML='<p style="color:var(--red);font-size:0.78rem">Monthly AI call limit reached.</p>';return;}
+  const suburb=currentPC&&PC[currentPC]?PC[currentPC].suburb:'Sydney';
+  const aclass=document.getElementById('aclass').value;
+  document.getElementById('news-out').innerHTML='<div class="spinner"><span class="spin">⟳</span> Loading commercial news...</div>';
+  const prompt=`Generate 4 realistic recent commercial property news items for ${aclass} assets in ${suburb}, Australia in 2026. Return ONLY a JSON array of 4 objects: {"source":string,"headline":string (max 12 words),"summary":string (1-2 sentences),"sentiment":"positive"|"neutral"|"negative"}. No markdown.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:prompt}]})});
+    const data=await res.json();
+    const arts=JSON.parse(data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim());
+    document.getElementById('news-out').innerHTML=arts.map(a=>`
+      <div class="news-item">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:3px"><span style="font-size:0.65rem;color:var(--ink3)">${a.source}</span><span style="font-size:0.62rem;padding:2px 7px;border-radius:7px;background:${a.sentiment==='positive'?'rgba(26,122,110,0.1)':a.sentiment==='negative'?'rgba(194,59,42,0.1)':'var(--paper3)'};color:${a.sentiment==='positive'?'var(--teal)':a.sentiment==='negative'?'var(--red)':'var(--ink3)'}">${a.sentiment}</span></div>
+        <p style="font-size:0.78rem;color:var(--ink);line-height:1.4;margin:2px 0">${a.headline}</p>
+        <p style="font-size:0.72rem;color:var(--ink2);line-height:1.5">${a.summary}</p>
+      </div>`).join('');
+  }catch(e){document.getElementById('news-out').innerHTML='<p style="color:var(--red);font-size:0.78rem">Could not load news.</p>';}
+}
+
+['price','rent','opex'].forEach(id=>document.getElementById(id).addEventListener('input',()=>{clearTimeout(calcTimer);calcTimer=setTimeout(calc,120);}));
+['vac-n','rate-n','wale-n','lvr-n','esc-n'].forEach(id=>document.getElementById(id).addEventListener('input',function(){sync(id.replace('-n',''),this.value);}));
+['r-price','r-rent','r-rate'].forEach(id=>document.getElementById(id).addEventListener('input',calcR));
+calc();renderUsage();
+</script>
+</body>
+</html>
